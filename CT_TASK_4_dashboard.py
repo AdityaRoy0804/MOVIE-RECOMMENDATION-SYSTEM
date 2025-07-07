@@ -48,7 +48,7 @@ conn.commit()
 # ---------------- LOAD MOVIE METADATA ----------------
 @st.cache_data
 def load_movies():
-    df = pd.read_csv(r"C:\Users\DJ COMPUTERS\OneDrive\Desktop\Movie Recommender App\u.item", sep='|', encoding='latin-1', header=None, usecols=[0, 1])
+    df = pd.read_csv("u.item", sep='|', encoding='latin-1', header=None, usecols=[0, 1])
     df.columns = ['movie_id', 'title']
     return df
 
