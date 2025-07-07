@@ -169,12 +169,12 @@ def main_ui():
 
             with col2:
                 if st.button("📋 Previous Feedback"):
-                    conn = sqlite3.connect("users.db")  # adjust if needed
+                    conn = get_db_connection()  # FIXED: was 'users.db'
                     df = pd.read_sql_query(
-                        f"SELECT * FROM user_ratings WHERE username = '{st.session_state.username}'",
-                        conn
+                        f"SELECT * FROM user_ratings WHERE username = ?",
+                        conn,
+                        params=(st.session_state.username,)
                     )
-                    conn.close()
                     if df.empty:
                         st.warning("⚠️ No previous ratings found.")
                     else:
@@ -185,12 +185,12 @@ def main_ui():
         else:
             st.info("✅ You've already submitted ratings. Go to the next tab for recommendations.")
             if st.button("📋 Previous Feedback"):
-                conn = sqlite3.connect("users.db")  # adjust if needed
+                conn = get_db_connection()  # FIXED: was 'users.db'
                 df = pd.read_sql_query(
-                    f"SELECT * FROM user_ratings WHERE username = '{st.session_state.username}'",
-                    conn
+                    f"SELECT * FROM user_ratings WHERE username = ?",
+                    conn,
+                    params=(st.session_state.username,)
                 )
-                conn.close()
                 if df.empty:
                     st.warning("⚠️ No previous ratings found.")
                 else:
