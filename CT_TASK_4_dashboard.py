@@ -106,7 +106,7 @@ def recommend_top_n(model, user_df, username, N=5):
 
 # ---------------- LOGIN UI ----------------
 def login_ui():
-    st.markdown("## 🔐 Login or Register")
+    st.markdown("<h2 style='text-align: center;'>🔐 Login or Register</h2>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1.5, 2, 1.5])
     with col2:
         action = st.radio("Choose", ["Login", "Register"], horizontal=True)
