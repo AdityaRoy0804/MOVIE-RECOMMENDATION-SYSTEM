@@ -80,5 +80,5 @@ streamlit run CT_TASK_4_dashboard.py
 ## 👨‍💻 Author
 
 ### 📬 Aditya Roy  
-- [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/adityaroy0804)  
+- [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?logo=linkedin)](https://www.linkedin.com/in/aditya-kumar-roy-257a1428a/))  
 - [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?logo=github)](https://github.com/AdityaRoy0804)  
