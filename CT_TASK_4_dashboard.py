@@ -164,6 +164,15 @@ def main_ui():
                     st.warning("⚠️ Please rate at least one movie.")
         else:
             st.info("✅ You've already submitted ratings. Go to the next tab for recommendations.")
+            if st.button("📋 Show My Ratings"):
+        conn = sqlite3.connect("users.db")  # Replace with your actual database file name
+        df = pd.read_sql_query(f"SELECT * FROM user_ratings WHERE username = '{st.session_state.username}'", conn)
+        conn.close()
+        
+        if df.empty:
+            st.warning("⚠️ No ratings found for this user.")
+        else:
+            st.dataframe(df)
 
     # ---------- Get Recommendations ----------
     with tabs[1]:
