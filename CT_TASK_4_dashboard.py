@@ -50,10 +50,11 @@ conn.commit()
 def load_movies():
     df = pd.read_csv("u.item", sep='|', encoding='latin-1', header=None, usecols=[0, 1])
     df.columns = ['movie_id', 'title']
+    df["movie_id"] = df["movie_id"].astype(str)
     return df
 
 movies_df = load_movies()
-movie_dict = dict(zip(movies_df.movie_id.astype(str), movies_df.title))
+movie_dict = dict(zip(movies_df.movie_id, movies_df.title))
 
 # ---------------- MODEL ----------------
 @st.cache_resource
@@ -88,6 +89,7 @@ def store_user_ratings(username, ratings):
 
 def get_user_ratings(username):
     df = pd.read_sql_query("SELECT username, movie_id, rating FROM user_ratings WHERE username = ?", conn, params=(username,))
+    df["movie_id"] = df["movie_id"].astype(str)
     return df
 
 def recommend_top_n(model, user_df, username, N=5):
@@ -97,7 +99,7 @@ def recommend_top_n(model, user_df, username, N=5):
     model.fit(trainset)
 
     rated = set(user_df['movie_id'])
-    all_movies = set(movies_df['movie_id'].astype(str))
+    all_movies = set(movies_df['movie_id'])
     unrated = list(all_movies - rated)
 
     predictions = [model.predict(username, movie_id) for movie_id in unrated]
@@ -139,7 +141,6 @@ def main_ui():
     # ---------- Rate Movies ----------
     with tabs[0]:
         st.subheader("Rate these 5 movies (or skip with 0)")
-
         static_movies = st.session_state.rated_movies
         ratings = {}
 
@@ -168,23 +169,33 @@ def main_ui():
 
             with col2:
                 if st.button("📋 Previous Feedback"):
-                    df = get_user_ratings(st.session_state.username)
+                    conn = sqlite3.connect("users.db")  # adjust if needed
+                    df = pd.read_sql_query(
+                        f"SELECT * FROM user_ratings WHERE username = '{st.session_state.username}'",
+                        conn
+                    )
+                    conn.close()
                     if df.empty:
                         st.warning("⚠️ No previous ratings found.")
                     else:
-                        df['movie_id'] = df['movie_id'].astype(str)
-                        movies_df['movie_id'] = movies_df['movie_id'].astype(str)
+                        df["movie_id"] = df["movie_id"].astype(str)
+                        movies_df["movie_id"] = movies_df["movie_id"].astype(str)
                         df = df.merge(movies_df, how='left', on='movie_id')
                         st.dataframe(df[['title', 'rating']])
-
         else:
             st.info("✅ You've already submitted ratings. Go to the next tab for recommendations.")
-
             if st.button("📋 Previous Feedback"):
-                df = get_user_ratings(st.session_state.username)
+                conn = sqlite3.connect("users.db")  # adjust if needed
+                df = pd.read_sql_query(
+                    f"SELECT * FROM user_ratings WHERE username = '{st.session_state.username}'",
+                    conn
+                )
+                conn.close()
                 if df.empty:
                     st.warning("⚠️ No previous ratings found.")
                 else:
+                    df["movie_id"] = df["movie_id"].astype(str)
+                    movies_df["movie_id"] = movies_df["movie_id"].astype(str)
                     df = df.merge(movies_df, how='left', on='movie_id')
                     st.dataframe(df[['title', 'rating']])
 
