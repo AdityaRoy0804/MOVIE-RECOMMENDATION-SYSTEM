@@ -1,4 +1,5 @@
-streamlit
-pandas
-joblib
+streamlit==1.46.1
+pandas==2.3.0
+joblib==1.5.1
 scikit-surprise==1.1.4
+numpy==1.26.4
