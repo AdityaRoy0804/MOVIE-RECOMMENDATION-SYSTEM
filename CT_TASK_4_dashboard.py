@@ -138,35 +138,51 @@ def main_ui():
 
     # ---------- Rate Movies ----------
    with tabs[0]:
-    st.subheader("Rate these 5 movies (or skip with 0)")
-
-    static_movies = st.session_state.rated_movies
-    ratings = {}
-
-    if not st.session_state.feedback_given:
-        for _, row in static_movies.iterrows():
-            rating = st.slider(
-                label=row["title"],
-                min_value=0, max_value=5,
-                value=0,
-                help="0 = Not Watched",
-                key=f"slider_{row['movie_id']}"
-            )
-            if rating != 0:
-                ratings[str(row["movie_id"])] = rating
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            if st.button("✅ Submit Ratings"):
-                if ratings:
-                    store_user_ratings(st.session_state.username, ratings)
-                    st.session_state.feedback_given = True
-                    st.success("🎉 Thank you! Your feedback is saved.")
-                else:
-                    st.warning("⚠️ Please rate at least one movie.")
-
-        with col2:
+        st.subheader("Rate these 5 movies (or skip with 0)")
+    
+        static_movies = st.session_state.rated_movies
+        ratings = {}
+    
+        if not st.session_state.feedback_given:
+            for _, row in static_movies.iterrows():
+                rating = st.slider(
+                    label=row["title"],
+                    min_value=0, max_value=5,
+                    value=0,
+                    help="0 = Not Watched",
+                    key=f"slider_{row['movie_id']}"
+                )
+                if rating != 0:
+                    ratings[str(row["movie_id"])] = rating
+    
+            col1, col2 = st.columns(2)
+    
+            with col1:
+                if st.button("✅ Submit Ratings"):
+                    if ratings:
+                        store_user_ratings(st.session_state.username, ratings)
+                        st.session_state.feedback_given = True
+                        st.success("🎉 Thank you! Your feedback is saved.")
+                    else:
+                        st.warning("⚠️ Please rate at least one movie.")
+    
+            with col2:
+                if st.button("📋 Previous Feedback"):
+                    conn = sqlite3.connect("users.db")  # adjust if DB name is different
+                    df = pd.read_sql_query(
+                        f"SELECT * FROM user_ratings WHERE username = '{st.session_state.username}'",
+                        conn
+                    )
+                    conn.close()
+                    if df.empty:
+                        st.warning("⚠️ No previous ratings found.")
+                    else:
+                        st.dataframe(df)
+    
+        else:
+            st.info("✅ You've already submitted ratings. Go to the next tab for recommendations.")
+    
+            # Show Previous Feedback button even if already submitted
             if st.button("📋 Previous Feedback"):
                 conn = sqlite3.connect("users.db")  # adjust if DB name is different
                 df = pd.read_sql_query(
@@ -178,22 +194,6 @@ def main_ui():
                     st.warning("⚠️ No previous ratings found.")
                 else:
                     st.dataframe(df)
-
-    else:
-        st.info("✅ You've already submitted ratings. Go to the next tab for recommendations.")
-
-        # Show Previous Feedback button even if already submitted
-        if st.button("📋 Previous Feedback"):
-            conn = sqlite3.connect("users.db")  # adjust if DB name is different
-            df = pd.read_sql_query(
-                f"SELECT * FROM user_ratings WHERE username = '{st.session_state.username}'",
-                conn
-            )
-            conn.close()
-            if df.empty:
-                st.warning("⚠️ No previous ratings found.")
-            else:
-                st.dataframe(df)
 
 
     # ---------- Get Recommendations ----------
