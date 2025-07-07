@@ -172,6 +172,8 @@ def main_ui():
                     if df.empty:
                         st.warning("⚠️ No previous ratings found.")
                     else:
+                        df['movie_id'] = df['movie_id'].astype(str)
+                        movies_df['movie_id'] = movies_df['movie_id'].astype(str)
                         df = df.merge(movies_df, how='left', on='movie_id')
                         st.dataframe(df[['title', 'rating']])
 
